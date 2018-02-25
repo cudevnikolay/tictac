@@ -24,6 +24,12 @@ html {
         line-height: 100px;
         text-align: center;  
     }
+#new_game {
+    background-color: #aaa;
+    color: #000;
+    cursor: pointer;
+    padding: 10px 30px;
+}
 .X {
     color:blue
 }
