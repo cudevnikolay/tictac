@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Language" content="ru">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Крестики-нолики</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+   <body>
+        <H1>Крестики-Нолики</H1>
+        <div class="game-block">
+            <table id="board" onclick="game.doBoardClick(event);"></table>
+        </div>
+        <div class="setting-block">
+            <p>
+                <input id="new_game" type="button" value="Новая игра" onclick="game.drawBoard()">
+            </p> 
+            
+            <p>
+                <input name="level" type="radio" value="0" id="level1" checked>
+                <label for="level1">Играть с другом</label><BR>
+                <input name="level" type="radio" value="1" id="level2">
+                <label for="level2">Играть с ботом</label><BR>
+            </p> 
+
+            <p>
+                <input name="size" type="radio" value="3" id="x3" checked>
+                <label for="x3">3 x 3</label><BR>
+                <input name="size" type="radio" value="4" id="x4">
+                <label for="x4">4 x 4</label><BR>
+                <input name="size" type="radio" value="5" id="x5">
+                <label for="x5">5 x 5</label>
+            </p>
+        </div>    
+        <script src="main.js"></script>
+   </body>     
+</html>
