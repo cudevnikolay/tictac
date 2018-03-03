@@ -12,12 +12,14 @@ function TicTac() {
     this.lastMove = true;
     this.inProcess = true;
     this.size = 3;
+    this.stroke_hash = window.location.hash.slice(1);
     
     // object methods
     this.setSettings = function() {
         this.size = document.querySelector('input[name=size]:checked').value;  
     }, 
     this.drawBoard = function() {
+        this.stroke_hash = window.location.hash = '';
         var ready = this.buildTable();
         this.inProcess = true;
         this.lastMove == true;
@@ -45,6 +47,7 @@ function TicTac() {
         }
 
         this.boardTable.innerHTML = fields;
+        this.checkStroke();
         return true;
     },
     this.setBotLevel = function() {
@@ -53,11 +56,14 @@ function TicTac() {
     this.checkWinner = function(xCount, oCount) {
         // Process results of the scan for a winner.
         if (this.size == oCount || this.size == xCount) { 
+            var that = this;
             this.inProcess = false;
             winner = this.lastMove ? "O" : "X";
             countHits = this.boardTable.getElementsByClassName(winner).length;
             countHits += (countHits > 4) ? ' ходов' : ' хода';
-            if (confirm(winner +"-man выграл за " + countHits + "! Продолжить?")) this.drawBoard();
+            setTimeout(function(){
+                if (confirm(winner +"-man выграл за " + countHits + "! Продолжить?")) that.drawBoard();    
+            }, 100);
            
             return true;
         }
@@ -108,42 +114,66 @@ function TicTac() {
         if (this.checkWinner(xCount, oCount)) return;
         
         if (total == this.size * this.size) {
-           alert("Ничья!");
-           this.inProcess = false;
-           return;
+            setTimeout(function(){
+                alert("Ничья!");
+            }, 100);
+            this.inProcess = false;
+            return;
         }
         
         return true;
     },
     this.doBoardClick = function(event) {
         if (this.inProcess) {
-           if ("TD" == event.target.tagName) {
-              var strCell = event.target;
-              // Check whether the cell is available.
-              if ("" == strCell.innerHTML) {
-                 strCell.innerText = (this.lastMove ? "X" : "O");
-                 strCell.className = (this.lastMove ? "X" : "O");
-                 this.lastMove = !this.lastMove;
-                 
-                 if (!this.checkGame()) return;
-                 
-                 if (this.botGame) {
-                     var item = strCell.getAttribute('item');
-                     this.emptyStroke = this.emptyStroke.filter(function(value) { 
-                        return item != value
-                     });
-                     this.botMove = !this.botMove;
-                     if (this.botMove) {  
-                        this.findBotStroke();
-                     }
-                 }
-              }
-           }
+            if ("TD" == event.target.tagName) {
+                var strCell = event.target;
+                // Check whether the cell is available.
+                if ("" == strCell.innerHTML) {
+                    var mark = (this.lastMove ? "X" : "O");
+                    strCell.innerText = mark;
+                    strCell.className = mark;
+                    this.lastMove = !this.lastMove;
+                    window.location.hash += mark + '=' + strCell.getAttribute('item') + '@';
+                    
+                    if (!this.checkGame()) return false;
+
+                    if (this.botGame) {
+                        var item = strCell.getAttribute('item');
+                        this.emptyStroke = this.emptyStroke.filter(function(value) { 
+                            return item != value
+                        });
+                        this.botMove = !this.botMove;
+                        if (this.botMove) {  
+                            this.findBotStroke();
+                        }
+                    }
+                }
+            }
         }
     },
     this.findBotStroke = function() {
         var index = this.support.getRandomInt(0, this.emptyStroke.length);
         this.boardTable.querySelector('td[item="' + this.emptyStroke[index] + '"]').click();
+    },
+    this.checkStroke = function() {
+        if (this.stroke_hash.length) {
+            this.lastMove = '';
+            var find = /(O|X)\=(\d+)/i,
+                that = this;
+                
+            this.stroke_hash.split("@").forEach(function(element) {
+                stroke = element.match(find);
+                if (stroke && stroke.length == 3) {
+                    if (that.lastMove === '') that.lastMove = (stroke[1] === 'X' ? true : false);
+                    var strCell = that.boardTable.querySelector('td[item="' + stroke[2] + '"]');
+                    strCell.innerText = stroke[1];
+                    strCell.className = stroke[1];
+                    that.lastMove = ! that.lastMove;
+                }
+            });
+            
+            this.checkGame();
+        }
     }
 }
 
